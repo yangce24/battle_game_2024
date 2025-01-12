@@ -67,7 +67,9 @@ void T34Tank::Move(float move_speed, float rotate_angular_speed) {
     if (input.key_down[GLFW_KEY_S]) offset.y -= 1.0f;
 
     
-   
+    if (is_speed_boost_active_) {
+      move_speed *= 2.0f;  
+    }
 
     offset *= kSecondPerTick * move_speed;
     auto new_position = position_ + glm::vec2{glm::rotate(glm::mat4(1.0f), rotation_, glm::vec3(0.0f, 0.0f, 1.0f)) * glm::vec4(offset, 0.0f, 0.0f)};
@@ -108,7 +110,29 @@ void T34Tank::Fire() {
   if (fire_count_down_) fire_count_down_--;
 }
 
+void T34Tank::UseSpeedBoost() {
+  auto player = game_core_->GetPlayer(player_id_);
+  if (player) {
+    auto &input = player->GetInputData();
+    if (speed_boost_cooldown_ == 0 && input.key_down[GLFW_KEY_SPACE]) {
+      is_speed_boost_active_ = true;
+      speed_boost_timer_ = 3 * kTickPerSecond;  
+      speed_boost_cooldown_ = 5 * kTickPerSecond;  
+    }
+  }
 
+  if (is_speed_boost_active_) {
+    if (speed_boost_timer_ > 0) {
+      speed_boost_timer_--;
+    } else {
+      is_speed_boost_active_ = false;
+    }
+  }
+
+  if (speed_boost_cooldown_ > 0) {
+    speed_boost_cooldown_--;
+  }
+}
 
 bool T34Tank::IsHit(glm::vec2 position) const {
   position = WorldToLocal(position);
