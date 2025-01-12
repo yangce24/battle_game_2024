@@ -22,8 +22,6 @@ class T34Tank : public Unit {
   uint32_t fire_count_down_{0};
 
  
-  bool is_speed_boost_active_{false};  
-  uint32_t speed_boost_timer_{0};     
-  uint32_t speed_boost_cooldown_{0};  
+ 
 };
 }  
